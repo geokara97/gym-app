@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athletes - Training Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="page-nav">
+            <a href="index.html" class="nav-back">← Back to Dashboard</a>
+        </nav>
+
+        <!-- Header -->
+        <div class="section-header">
+            <h1>👥 Athletes</h1>
+            <button class="btn btn-primary" id="add-athlete-btn">+ Add Athlete</button>
+        </div>
+        
+        <div id="athletes-list" class="athletes-grid">
+            <!-- Athletes will be loaded here -->
+        </div>
+
+        <!-- Add Athlete Modal -->
+        <div id="athlete-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Add New Athlete</h3>
+                <form id="athlete-form">
+                    <div class="form-group">
+                        <label for="athlete-name">Name *</label>
+                        <input type="text" id="athlete-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="athlete-email">Email</label>
+                        <input type="email" id="athlete-email">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="athlete-weight">Weight (kg)</label>
+                            <input type="number" id="athlete-weight" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="athlete-height">Height (cm)</label>
+                            <input type="number" id="athlete-height" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="athlete-notes">Notes</label>
+                        <textarea id="athlete-notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Athlete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="athletes-page.js"></script>
+</body>
+</html>

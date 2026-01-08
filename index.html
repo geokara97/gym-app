@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Training Tracker - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>💪 Athlete Training Tracker</h1>
+            <p class="subtitle">Professional workout tracking and management</p>
+        </header>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <a href="athletes.html" class="dashboard-card">
+                <div class="dashboard-icon">👥</div>
+                <h2>Athletes</h2>
+                <p>Manage athlete profiles and view their progress</p>
+            </a>
+
+            <a href="log-workout.html" class="dashboard-card">
+                <div class="dashboard-icon">📝</div>
+                <h2>Log Workout</h2>
+                <p>Record new workouts with detailed set tracking</p>
+            </a>
+
+            <a href="workout-history.html" class="dashboard-card">
+                <div class="dashboard-icon">📊</div>
+                <h2>Workout History</h2>
+                <p>View and analyze past training sessions</p>
+            </a>
+
+            <a href="exercise-library.html" class="dashboard-card">
+                <div class="dashboard-icon">🏋️</div>
+                <h2>Exercise Library</h2>
+                <p>Browse and manage your exercise database</p>
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <h3>Quick Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-athletes">-</div>
+                    <div class="stat-label">Total Athletes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-workouts">-</div>
+                    <div class="stat-label">Total Workouts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="workouts-this-week">-</div>
+                    <div class="stat-label">This Week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-exercises">-</div>
+                    <div class="stat-label">Exercises</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="index-page.js"></script>
+</body>
+</html>

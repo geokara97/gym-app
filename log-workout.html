@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Workout - Training Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="page-nav">
+            <a href="index.html" class="nav-back">← Back to Dashboard</a>
+        </nav>
+
+        <h1>📝 Log Workout</h1>
+        
+        <form id="workout-form">
+            <div class="form-group">
+                <label>Select Athletes (multiple) *</label>
+                <div class="checkbox-grid" id="athlete-checkboxes">
+                    <!-- Will be populated -->
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="workout-date">Date *</label>
+                    <input type="date" id="workout-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="workout-time">Time</label>
+                    <input type="time" id="workout-time">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Workout Splits (select one or more)</label>
+                <div class="radio-group" id="workout-splits"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="workout-duration">Duration (minutes)</label>
+                <input type="number" id="workout-duration">
+            </div>
+
+            <div class="form-group">
+                <label for="workout-notes">Workout Notes</label>
+                <textarea id="workout-notes" rows="2"></textarea>
+            </div>
+
+            <h3>Exercises</h3>
+            <div id="exercise-entries"></div>
+
+            <button type="button" class="btn btn-secondary" id="add-exercise-btn">+ Add Exercise</button>
+            <button type="submit" class="btn btn-primary">Save Workout</button>
+        </form>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="log-workout-page.js"></script>
+</body>
+</html>

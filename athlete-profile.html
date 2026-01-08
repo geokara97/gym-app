@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Profile - Training Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="page-nav">
+            <a href="athletes.html" class="nav-back">← Back to Athletes</a>
+        </nav>
+
+        <!-- Athlete Profile Header -->
+        <div class="profile-header">
+            <div class="profile-info">
+                <h1 id="athlete-name-display">Loading...</h1>
+                <div class="profile-stats-inline">
+                    <span class="stat-inline">
+                        <strong id="total-workouts-count">0</strong> Workouts
+                    </span>
+                    <span class="stat-inline">
+                        <strong id="last-workout-date">Never</strong> Last Session
+                    </span>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="edit-profile-btn">✏️ Edit Profile</button>
+        </div>
+
+        <!-- Athlete Details Card -->
+        <div class="profile-details-card">
+            <h3>Profile Information</h3>
+            <div class="profile-details-grid" id="profile-details">
+                <!-- Will be populated -->
+            </div>
+        </div>
+
+        <!-- Weight Tracking Section -->
+        <div class="weight-tracking-section">
+            <div class="section-header">
+                <h3>⚖️ Weight & BMI Tracking</h3>
+                <button class="btn btn-primary btn-sm" id="add-weight-btn">+ Add Weight Entry</button>
+            </div>
+
+            <div class="weight-stats-cards">
+                <div class="weight-stat-card">
+                    <div class="stat-label">Starting Weight</div>
+                    <div class="stat-value" id="starting-weight-display">-</div>
+                </div>
+                <div class="weight-stat-card">
+                    <div class="stat-label">Current Weight</div>
+                    <div class="stat-value" id="current-weight-display">-</div>
+                </div>
+                <div class="weight-stat-card">
+                    <div class="stat-label">Weight Change</div>
+                    <div class="stat-value" id="weight-change-display">-</div>
+                </div>
+                <div class="weight-stat-card">
+                    <div class="stat-label">Current BMI</div>
+                    <div class="stat-value" id="current-bmi-display">-</div>
+                    <div class="bmi-category" id="bmi-category-display"></div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h4>Weight Progress</h4>
+                    <canvas id="weight-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>BMI Progress</h4>
+                    <canvas id="bmi-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Weight Entry Modal -->
+        <div id="weight-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="weight-modal-close">&times;</span>
+                <h3>Add Weight Entry</h3>
+                <form id="weight-form">
+                    <div class="form-group">
+                        <label for="weight-date">Date *</label>
+                        <input type="date" id="weight-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-value">Weight (kg) *</label>
+                        <input type="number" id="weight-value" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Calculated BMI</label>
+                        <div class="bmi-preview" id="bmi-preview">
+                            <span class="bmi-value">-</span>
+                            <span class="bmi-cat">Enter weight to calculate</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight-notes">Notes</label>
+                        <textarea id="weight-notes" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Weight Entry</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal -->
+        <div id="edit-profile-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Edit Athlete Profile</h3>
+                <form id="edit-profile-form">
+                    <div class="form-group">
+                        <label for="edit-name">Name *</label>
+                        <input type="text" id="edit-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">Email</label>
+                        <input type="email" id="edit-email">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-weight">Weight (kg)</label>
+                            <input type="number" id="edit-weight" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-height">Height (cm)</label>
+                            <input type="number" id="edit-height" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dob">Date of Birth</label>
+                        <input type="date" id="edit-dob">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-notes">Notes</label>
+                        <textarea id="edit-notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Workout History Section -->
+        <div class="section-header" style="margin-top: 40px;">
+            <h2>📊 Workout History</h2>
+            <button class="btn btn-secondary" id="log-workout-btn">+ Log New Workout</button>
+        </div>
+
+        <div class="filters-section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="filter-date-from">From Date</label>
+                    <input type="date" id="filter-date-from">
+                </div>
+                <div class="form-group">
+                    <label for="filter-date-to">To Date</label>
+                    <input type="date" id="filter-date-to">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-sm" id="apply-filter-btn">Apply</button>
+                    <button class="btn btn-secondary btn-sm" id="reset-filter-btn">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="athlete-workouts-list">
+            <!-- Workouts will be loaded here -->
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="config.js"></script>
+    <script src="athlete-profile-page.js"></script>
+</body>
+</html>
