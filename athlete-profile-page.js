@@ -235,6 +235,7 @@ function displayWorkouts(workouts) {
             exerciseGroups[key].sets.push({
                 set_number: we.set_number || exerciseGroups[key].sets.length + 1,
                 reps: we.reps,
+                duration_seconds: we.duration_seconds,
                 weight: we.weight
             });
         });
@@ -268,7 +269,7 @@ function displayWorkouts(workouts) {
                                 ${exercise.sets.map(set => `
                                     <div class="set-display">
                                         <span class="set-label">Set ${set.set_number}:</span>
-                                        <span class="set-details">${set.reps} reps ${set.weight ? `× ${set.weight}kg` : ''}</span>
+                                        <span class="set-details">${formatSetAmount(set)} ${set.weight ? `× ${set.weight}kg` : ''}</span>
                                     </div>
                                 `).join('')}
                             </div>

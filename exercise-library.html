@@ -32,11 +32,24 @@
         <div id="exercise-modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h3>Add New Exercise</h3>
+                <h3 id="exercise-modal-title">Add New Exercise</h3>
                 <form id="exercise-form">
                     <div class="form-group">
                         <label for="exercise-name">Exercise Name *</label>
                         <input type="text" id="exercise-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Measured By *</label>
+                        <div class="radio-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="measurement-type" value="reps" checked>
+                                <span class="checkbox-text">🔁 Repetitions</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="measurement-type" value="duration">
+                                <span class="checkbox-text">⏱️ Duration (seconds)</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Split Categories (select one or more) *</label>
@@ -48,7 +61,7 @@
                         <label for="exercise-description">Description</label>
                         <textarea id="exercise-description" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Exercise</button>
+                    <button type="submit" class="btn btn-primary" id="exercise-submit-btn">Add Exercise</button>
                 </form>
             </div>
         </div>

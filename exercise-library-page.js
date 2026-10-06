@@ -3,6 +3,8 @@
 // ============================================
 
 let currentSplits = [];
+let currentExercises = [];
+let editingExerciseId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSplits();
@@ -11,11 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
-    document.getElementById('add-exercise-btn').addEventListener('click', () => {
-        openModal('exercise-modal');
-    });
-    
-    document.getElementById('exercise-form').addEventListener('submit', handleAddExercise);
+    document.getElementById('add-exercise-btn').addEventListener('click', openAddExercise);
+
+    document.getElementById('exercise-form').addEventListener('submit', handleSaveExercise);
     document.getElementById('filter-split').addEventListener('change', loadExercises);
 
     document.querySelector('.close').addEventListener('click', () => {
@@ -102,6 +102,8 @@ async function loadExercises() {
             };
         });
 
+        currentExercises = exercisesWithSplits;
+
         // Filter by split if selected
         if (splitFilter) {
             exercisesWithSplits = exercisesWithSplits.filter(exercise => 
@@ -134,27 +136,65 @@ function displayExercises(exercises) {
             ? exercise.splits.map(s => `<span class="exercise-split-badge">${s.split_name}</span>`).join('')
             : '<span class="exercise-split-badge">Uncategorized</span>';
 
+        const measureBadge = exercise.measurement_type === 'duration'
+            ? '<span class="exercise-measure-badge">⏱️ Duration</span>'
+            : '<span class="exercise-measure-badge">🔁 Reps</span>';
+
         return `
             <div class="exercise-library-item">
                 <div class="exercise-library-info">
                     <h4>${exercise.exercise_name}</h4>
-                    <div class="split-badges">${splitBadges}</div>
+                    <div class="split-badges">${splitBadges}${measureBadge}</div>
                     ${exercise.description ? `<p class="exercise-description">${exercise.description}</p>` : ''}
                 </div>
-                <button class="btn-icon btn-danger" onclick="deleteExercise(${exercise.exercise_id}, '${exercise.exercise_name.replace(/'/g, "\\'")}')">
-                    🗑️
-                </button>
+                <div class="exercise-library-actions">
+                    <button class="btn-icon" title="Edit" onclick="openEditExercise(${exercise.exercise_id})">
+                        ✏️
+                    </button>
+                    <button class="btn-icon btn-danger" title="Delete" onclick="deleteExercise(${exercise.exercise_id}, '${exercise.exercise_name.replace(/'/g, "\\'")}')">
+                        🗑️
+                    </button>
+                </div>
             </div>
         `;
     }).join('');
 }
 
-async function handleAddExercise(e) {
+function openAddExercise() {
+    editingExerciseId = null;
+    document.getElementById('exercise-form').reset();
+    document.getElementById('exercise-modal-title').textContent = 'Add New Exercise';
+    document.getElementById('exercise-submit-btn').textContent = 'Add Exercise';
+    openModal('exercise-modal');
+}
+
+function openEditExercise(exerciseId) {
+    const exercise = currentExercises.find(ex => ex.exercise_id === exerciseId);
+    if (!exercise) return;
+
+    editingExerciseId = exerciseId;
+    document.getElementById('exercise-form').reset();
+    document.getElementById('exercise-name').value = exercise.exercise_name;
+    document.getElementById('exercise-description').value = exercise.description || '';
+    document.querySelector(`input[name="measurement-type"][value="${exercise.measurement_type || 'reps'}"]`).checked = true;
+
+    const splitIds = exercise.splits.map(s => s.split_id);
+    document.querySelectorAll('input[name="exercise-split"]').forEach(checkbox => {
+        checkbox.checked = splitIds.includes(parseInt(checkbox.value));
+    });
+
+    document.getElementById('exercise-modal-title').textContent = 'Edit Exercise';
+    document.getElementById('exercise-submit-btn').textContent = 'Save Changes';
+    openModal('exercise-modal');
+}
+
+async function handleSaveExercise(e) {
     e.preventDefault();
 
     const exerciseName = document.getElementById('exercise-name').value;
     const description = document.getElementById('exercise-description').value || null;
-    
+    const measurementType = document.querySelector('input[name="measurement-type"]:checked').value;
+
     // Get selected splits
     const selectedSplits = Array.from(document.querySelectorAll('input[name="exercise-split"]:checked'))
         .map(checkbox => parseInt(checkbox.value));
@@ -164,22 +204,44 @@ async function handleAddExercise(e) {
         return;
     }
 
-    try {
-        // Insert exercise
-        const { data: exercise, error: exerciseError } = await db
-            .from('exercises')
-            .insert([{
-                exercise_name: exerciseName,
-                description: description
-            }])
-            .select()
-            .single();
+    const exerciseData = {
+        exercise_name: exerciseName,
+        description: description,
+        measurement_type: measurementType
+    };
 
-        if (exerciseError) throw exerciseError;
+    try {
+        let exerciseId = editingExerciseId;
+
+        if (exerciseId) {
+            const { error: exerciseError } = await db
+                .from('exercises')
+                .update(exerciseData)
+                .eq('exercise_id', exerciseId);
+
+            if (exerciseError) throw exerciseError;
+
+            // Replace the split links with the new selection
+            const { error: deleteError } = await db
+                .from('exercise_splits')
+                .delete()
+                .eq('exercise_id', exerciseId);
+
+            if (deleteError) throw deleteError;
+        } else {
+            const { data: exercise, error: exerciseError } = await db
+                .from('exercises')
+                .insert([exerciseData])
+                .select()
+                .single();
+
+            if (exerciseError) throw exerciseError;
+            exerciseId = exercise.exercise_id;
+        }
 
         // Insert exercise-split relationships
         const exerciseSplitRecords = selectedSplits.map(splitId => ({
-            exercise_id: exercise.exercise_id,
+            exercise_id: exerciseId,
             split_id: splitId
         }));
 
@@ -189,12 +251,13 @@ async function handleAddExercise(e) {
 
         if (splitsError) throw splitsError;
 
-        showToast('Exercise added successfully!', 'success');
+        showToast(editingExerciseId ? 'Exercise updated successfully!' : 'Exercise added successfully!', 'success');
         closeModal('exercise-modal');
         document.getElementById('exercise-form').reset();
+        editingExerciseId = null;
         await loadExercises();
     } catch (error) {
-        showToast('Error adding exercise: ' + error.message, 'error');
+        showToast('Error saving exercise: ' + error.message, 'error');
     }
 }
 

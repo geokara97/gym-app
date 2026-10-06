@@ -60,3 +60,14 @@ function formatTime(timeString) {
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
 }
+
+// "12 reps" for rep-based sets, "45 sec" / "2 min 30 sec" for timed sets
+function formatSetAmount(set) {
+    if (set.duration_seconds) {
+        const minutes = Math.floor(set.duration_seconds / 60);
+        const seconds = set.duration_seconds % 60;
+        if (minutes === 0) return `${seconds} sec`;
+        return seconds ? `${minutes} min ${seconds} sec` : `${minutes} min`;
+    }
+    return `${set.reps} reps`;
+}

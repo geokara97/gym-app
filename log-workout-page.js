@@ -26,6 +26,7 @@ async function initializeApp() {
 function setupEventListeners() {
     document.getElementById('add-exercise-btn').addEventListener('click', addExerciseEntry);
     document.getElementById('workout-form').addEventListener('submit', handleSaveWorkout);
+    document.getElementById('workout-splits').addEventListener('change', refreshExerciseSelects);
 }
 
 async function loadAthletes() {
@@ -109,12 +110,12 @@ async function loadExercises() {
         // Combine exercises with their splits
         currentExercises = exercises.map(exercise => {
             const splits = exerciseSplits
-                .filter(es => es.exercise_id === exercise.exercise_id)
-                .map(es => es.splits.split_name);
-            
+                .filter(es => es.exercise_id === exercise.exercise_id);
+
             return {
                 ...exercise,
-                split_names: splits.join(', ') || 'Uncategorized'
+                split_ids: splits.map(es => es.split_id),
+                split_names: splits.map(es => es.splits.split_name).join(', ') || 'Uncategorized'
             };
         });
 
@@ -123,13 +124,57 @@ async function loadExercises() {
     }
 }
 
+// Exercises belonging to the checked splits (all exercises when no split is checked)
+function getExerciseOptions() {
+    const selectedSplitIds = Array.from(document.querySelectorAll('input[name="workout-split"]:checked'))
+        .map(checkbox => parseInt(checkbox.value));
+
+    const exercises = selectedSplitIds.length === 0
+        ? currentExercises
+        : currentExercises.filter(exercise =>
+            exercise.split_ids.some(splitId => selectedSplitIds.includes(splitId)));
+
+    return exercises.map(exercise =>
+        `<option value="${exercise.exercise_id}">${exercise.exercise_name} (${exercise.split_names})</option>`
+    ).join('');
+}
+
+// Re-filter the exercise dropdowns already on the form when the split selection changes
+function refreshExerciseSelects() {
+    const exerciseOptions = getExerciseOptions();
+
+    document.querySelectorAll('.exercise-select').forEach(select => {
+        const previousValue = select.value;
+        select.innerHTML = `<option value="">-- Select Exercise --</option>${exerciseOptions}`;
+        // Keeps the chosen exercise if it still matches; otherwise falls back to the placeholder
+        select.value = previousValue;
+        if (select.value !== previousValue) {
+            select.value = '';
+            updateSetInputs(select.closest('.exercise-entry'));
+        }
+    });
+}
+
+function isDurationExercise(exerciseId) {
+    const exercise = currentExercises.find(ex => ex.exercise_id === exerciseId);
+    return exercise ? exercise.measurement_type === 'duration' : false;
+}
+
+// Switch an exercise entry's set inputs between reps and seconds
+function updateSetInputs(entry) {
+    const isDuration = isDurationExercise(parseInt(entry.querySelector('.exercise-select').value));
+
+    entry.querySelectorAll('.set-entry').forEach(setEntry => {
+        setEntry.querySelector('.amount-label').textContent = isDuration ? 'Seconds' : 'Reps';
+        setEntry.querySelector('.amount-input').placeholder = isDuration ? '30' : '12';
+    });
+}
+
 function addExerciseEntry() {
     exerciseCounter++;
     const container = document.getElementById('exercise-entries');
-    
-    const exerciseOptions = currentExercises.map(exercise => 
-        `<option value="${exercise.exercise_id}">${exercise.exercise_name} (${exercise.split_names})</option>`
-    ).join('');
+
+    const exerciseOptions = getExerciseOptions();
 
     const entryHTML = `
         <div class="exercise-entry" id="exercise-${exerciseCounter}">
@@ -140,7 +185,7 @@ function addExerciseEntry() {
             
             <div class="form-group">
                 <label>Select Exercise</label>
-                <select class="exercise-select" required>
+                <select class="exercise-select" required onchange="updateSetInputs(this.closest('.exercise-entry'))">
                     <option value="">-- Select Exercise --</option>
                     ${exerciseOptions}
                 </select>
@@ -169,8 +214,8 @@ function addSet(exerciseId) {
             <span class="set-number">Set ${setNumber}</span>
             <div class="set-inputs">
                 <div class="form-group-inline">
-                    <label>Reps</label>
-                    <input type="number" class="reps-input" min="1" required placeholder="12">
+                    <label class="amount-label">Reps</label>
+                    <input type="number" class="amount-input" min="1" required placeholder="12">
                 </div>
                 <div class="form-group-inline">
                     <label>Weight (kg)</label>
@@ -183,6 +228,7 @@ function addSet(exerciseId) {
     
     container.insertAdjacentHTML('beforeend', setHTML);
     updateSetNumbers(exerciseId);
+    updateSetInputs(document.getElementById(`exercise-${exerciseId}`));
 }
 
 function removeSet(button, exerciseId) {
@@ -247,21 +293,23 @@ async function handleSaveWorkout(e) {
         const exerciseId = parseInt(entry.querySelector('.exercise-select').value);
         
         if (!exerciseId) return;
-        
+
+        const isDuration = isDurationExercise(exerciseId);
         const setsContainer = entry.querySelector('.sets-container');
         const sets = Array.from(setsContainer.querySelectorAll('.set-entry'));
-        
+
         sets.forEach((setEntry, setIndex) => {
-            const reps = parseInt(setEntry.querySelector('.reps-input').value);
+            const amount = parseInt(setEntry.querySelector('.amount-input').value);
             const weight = parseFloat(setEntry.querySelector('.weight-input').value) || null;
-            
-            if (reps) {
+
+            if (amount) {
                 exerciseEntries.push({
                     exercise_id: exerciseId,
                     exercise_order: exerciseIndex + 1,
                     set_number: setIndex + 1,
                     sets: 1,
-                    reps: reps,
+                    reps: isDuration ? null : amount,
+                    duration_seconds: isDuration ? amount : null,
                     weight: weight
                 });
             }
