@@ -2,9 +2,8 @@
 // Shared Configuration
 // ============================================
 // TODO: Replace these with your actual Supabase credentials
-const SUPABASE_URL = 'https://avrhtpevanttobqsejpn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2cmh0cGV2YW50dG9icXNlanBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4OTAwNTgsImV4cCI6MjA4MzQ2NjA1OH0.QBzys46UsXYW1DPbEpWW_epmYSLzWuPgxHlKjAOHIfE';
-
+const SUPABASE_URL = 'https://irjcsmywlfahbckibbps.supabase.co';
+const SUPABASE_ANON_KEY = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyamNzbXl3bGZhaGJja2liYnBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyOTMwMjIsImV4cCI6MjEwNjg2OTAyMn0.V7tQB72dck_pZ0WA_6zoSdH2hdsboGbJOp5YxFEeTtg`;
 // Initialize Supabase client
 const { createClient } = window.supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
